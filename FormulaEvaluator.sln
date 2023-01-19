@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaEvaluator", "FormulaEvaluator\FormulaEvaluator.csproj", "{A655A836-3EDC-4428-ADA3-FC76034B825E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaEvaluatorTester", "FormulaEvaluatorTester\FormulaEvaluatorTester.csproj", "{BFD4B24A-96AA-4B91-8E78-B73B06A70249}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D0B518D-5418-470C-968D-98F0CD440043}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A655A836-3EDC-4428-ADA3-FC76034B825E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A655A836-3EDC-4428-ADA3-FC76034B825E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A655A836-3EDC-4428-ADA3-FC76034B825E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A655A836-3EDC-4428-ADA3-FC76034B825E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFD4B24A-96AA-4B91-8E78-B73B06A70249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFD4B24A-96AA-4B91-8E78-B73B06A70249}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFD4B24A-96AA-4B91-8E78-B73B06A70249}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFD4B24A-96AA-4B91-8E78-B73B06A70249}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {75F0FE84-F118-4D93-AFCD-070DD08CB17A}
+	EndGlobalSection
+EndGlobal
