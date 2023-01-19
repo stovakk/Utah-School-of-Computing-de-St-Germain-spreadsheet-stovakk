@@ -1,7 +1,4 @@
 ﻿using FormulaEvalauator;
-using OpenXmlPowerTools;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 
 /// <summary>
 /// This method is used to test the FormulaEvaluator class on it's Evaluate
@@ -482,7 +479,7 @@ public static class FormulaEvaluatorTest
     {
         Evaluator ev = new Evaluator();
         int value;
-        value = Evaluator.Evaluate("Sa + 4 + (3 * 2) / 6", Sa => 2);
+        value = Evaluator.Evaluate("S + 4 + (3 * 2) / 6", S => 2);
         return value == 7;
     }
 
