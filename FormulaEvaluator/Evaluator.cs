@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace FormulaEvalauator
+namespace FormulaEvaluator
+
 {
     using System.Text.RegularExpressions;
 

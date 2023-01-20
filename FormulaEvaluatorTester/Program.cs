@@ -1,4 +1,5 @@
-﻿using FormulaEvalauator;
+﻿
+using FormulaEvaluator;
 
 /// <summary>
 /// This method is used to test the FormulaEvaluator class on it's Evaluate
