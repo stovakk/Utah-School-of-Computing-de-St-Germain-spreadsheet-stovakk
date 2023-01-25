@@ -18,22 +18,22 @@ namespace DependencyGraph
     /// t1 depends on s1; s1 must be evaluated before t1
     /// 
     /// A DependencyGraph can be modeled as a set of ordered pairs of strings.  Two 
-  ///  ordered pairs
-  /// (s1,t1) and (s2,t2) are considered equal if and only if s1 equals s2 and t1 
-  ///  equals t2.
+    ///  ordered pairs
+    /// (s1,t1) and (s2,t2) are considered equal if and only if s1 equals s2 and t1 
+    ///  equals t2.
     /// Recall that sets never contain duplicates.  If an attempt is made to add an 
-  ///  element to a
-  /// set, and the element is already in the set, the set remains unchanged.
-  /// 
-  /// Given a DependencyGraph DG:
-  /// 
-  ///    (1) If s is a string, the set of all strings t such that (s,t) is in DG is
-  /// called dependents(s).
-  ///        (The set of things that depend on s)    
-  ///        
-  ///    (2) If s is a string, the set of all strings t such that (t,s) is in DG is
-  /// called dependees(s).
-  ///        (The set of things that s depends on) 
+    ///  element to a
+    /// set, and the element is already in the set, the set remains unchanged.
+    /// 
+    /// Given a DependencyGraph DG:
+    /// 
+    ///    (1) If s is a string, the set of all strings t such that (s,t) is in DG is
+    /// called dependents(s).
+    ///        (The set of things that depend on s)    
+    ///        
+    ///    (2) If s is a string, the set of all strings t such that (t,s) is in DG is
+    /// called dependees(s).
+    ///        (The set of things that s depends on) 
     //
     // For example, suppose DG = {("a", "b"), ("a", "c"), ("b", "d"), ("d", "d")}
     //     dependents("a") = {"b", "c"}
@@ -45,64 +45,100 @@ namespace DependencyGraph
     //     dependees("c") = {"a"}
     //     dependees("d") = {"b", "d"}
     /// </summary>
-  public class DependencyGraph
+    public class DependencyGraph
     {
-        private Dictionary<String, ArrayList> dependents = new Dictionary<string, ArrayList>();
-        private Dictionary<String, ArrayList> dependees = new Dictionary<string, ArrayList>();
+        private Dictionary<String, HashSet<String>> dependents;
+        private Dictionary<String, HashSet<String>> dependees;
+        private int pairs;
 
         /// <summary>
         /// Creates an empty DependencyGraph.
         /// </summary>
         public DependencyGraph()
         {
+            dependents = new Dictionary<string, HashSet<String>>();
+            dependees = new Dictionary<string, HashSet<String>>();
         }
         /// <summary>
         /// The number of ordered pairs in the DependencyGraph.
         /// </summary>
         public int Size
         {
-            return 0;
+            get { return pairs; }
+
         }
         /// <summary>
         /// The size of dependees(s).
         /// This property is an example of an indexer.  If dg is a DependencyGraph, you
-    /// would invoke it like this:
-    /// dg["a"]
-    /// It should return the size of dependees("a")
-    /// </summary>
-    public int this[string s]
+        /// would invoke it like this:
+        /// dg["a"]
+        /// It should return the size of dependees("a")
+        /// </summary>
+        public int this[string s]
         {
-            get { return 0; }
+            get
+            {
+                if (dependees.ContainsKey(s))
+                {
+                    return dependees.Count;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
         }
         /// <summary>
         /// Reports whether dependents(s) is non-empty.
         /// </summary>
         public bool HasDependents(string s)
         {
-            return dependents[s].Count > 0;
+            if (dependents.ContainsKey(s) && dependents.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         /// <summary>
         /// Reports whether dependees(s) is non-empty.
         /// </summary>
         public bool HasDependees(string s)
         {
-            return dependees[s].Count > 0;
+            if (dependees.ContainsKey(s) && dependees.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         /// <summary>
         /// Enumerates dependents(s).
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            List<string> result = new();
-            ArrayList dependents = dependents[s];
-            return dependents;
+            if (!dependents.ContainsKey(s))
+            {
+                return new HashSet<String>();
+            }
+            HashSet<String> result = dependents[s];
+            return result;
         }
         /// <summary>
         /// Enumerates dependees(s).
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
-            return null;
+            if (!dependees.ContainsKey(s))
+            {
+                return new HashSet<String>();
+            }
+            HashSet<String> result = dependees[s];
+            return result;
         }
         /// <summary>
         /// <para>Adds the ordered pair (s,t), if it doesn't exist</para>
@@ -116,6 +152,40 @@ namespace DependencyGraph
         /// <param name="t"> t cannot be evaluated until s is</param>        /// 
         public void AddDependency(string s, string t)
         {
+            if (!dependents.ContainsKey(s) && !dependees.ContainsKey(t))
+            {
+                HashSet<String> newDependents = new HashSet<String>();
+                HashSet<String> newDependees = new HashSet<String>();
+                dependents.Add(s, newDependents);
+                dependees.Add(t, newDependees);
+                dependents[s].Add(t);
+                dependees[t].Add(s);
+            }
+            else if (dependents.ContainsKey(s) && dependees.ContainsKey(t))
+            {
+                dependents[s].Add(t);
+                dependees[t].Add(s);
+            }
+            else if (dependents.ContainsKey(s) && !dependees.ContainsKey(t))
+            {
+                HashSet<String> newDependees = new HashSet<String>();
+                Console.WriteLine("here");
+                dependents[s].Add(t);
+                dependees.Add(t, newDependees);
+                dependees[t].Add(s);
+            }
+            else if (!dependents.ContainsKey(s) && dependees.ContainsKey(t))
+            {
+                HashSet<String> newDependents = new HashSet<String>();
+                dependents.Add(s, newDependents);
+                dependents[s].Add(t);
+                dependees[t].Add(s);
+            }
+            else
+            {
+                return;
+            }
+            pairs++;
         }
         /// <summary>
         /// Removes the ordered pair (s,t), if it exists
@@ -124,6 +194,12 @@ namespace DependencyGraph
         /// <param name="t"></param>
         public void RemoveDependency(string s, string t)
         {
+            if (dependents.ContainsKey(s) && dependents[s].Contains(t))
+            {
+                dependents[s].Remove(t); 
+                dependees[t].Remove(s);
+                pairs--;
+            }
         }
         /// <summary>
         /// Removes all existing ordered pairs of the form (s,r).  Then, for each
@@ -131,6 +207,19 @@ namespace DependencyGraph
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            if (dependents.ContainsKey(s))
+            {
+                HashSet<String> replace = dependents[s];
+                foreach (string r in replace)
+                {
+                    RemoveDependency(r, s);
+                }
+            }
+
+            foreach (string t in newDependents)
+            {
+                AddDependency(s, t);
+            }
         }
         /// <summary>
         /// Removes all existing ordered pairs of the form (r,s).  Then, for each 
@@ -138,6 +227,21 @@ namespace DependencyGraph
         /// </summary>
         public void ReplaceDependees(string s, IEnumerable<string> newDependees)
         {
+                HashSet<String> replace = dependees[s];
+                foreach (string r in replace)
+                {
+                    dependents[r].Remove(s);
+                    dependees[s].Remove(r);
+                    pairs--;
+                }
+            
+
+            foreach (string t in newDependees)
+            {
+                dependents[t].Add(s);
+                dependees[s].Add(t);
+                pairs++;
+            }
         }
     }
 }
