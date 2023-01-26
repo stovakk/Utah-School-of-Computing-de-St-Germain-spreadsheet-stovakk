@@ -13,6 +13,8 @@ namespace DependencyGraphTests
     [TestClass()]
     public class DependencyGraphTest
     {
+        private const int V = 0;
+
         /// <summary>
         ///Empty graph should contain nothing
         ///</summary>
@@ -293,8 +295,98 @@ namespace DependencyGraphTests
             DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("c", "b");
+            t.AddDependency("", "");
             Assert.IsTrue(t.HasDependees("b"));
             Assert.IsFalse(t.HasDependees("a"));
+            Assert.IsTrue(t.Size == 3);
+        }
+
+        [TestMethod()]
+        public void testSizeZero()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            Assert.IsTrue(t.Size == 0);
+        }
+
+        [TestMethod()]
+        public void testSizeAfterRemove()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.RemoveDependency("a", "b");
+            Assert.IsTrue(t.Size == 1);
+            t.RemoveDependency("b", "b");
+            Assert.IsTrue(t.Size == 0);
+        }
+
+        [TestMethod()]
+        public void testRemoveNA()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.RemoveDependency("c", "b");
+            Assert.IsTrue(t.Size == 2);
+            t.AddDependency("b", "b");
+            Assert.IsTrue(t.Size == 2);
+        }
+
+        [TestMethod()]
+        public void testAddNA()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("b", "b");
+            Assert.IsTrue(t.Size == 2);
+        }
+
+        [TestMethod()]
+        public void testHasDependeesFalse()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("c", "b");
+            Assert.IsFalse(t.HasDependees("c"));
+        }
+
+        [TestMethod()]
+        public void testRemoveLastNum()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("c", "b");
+            t.RemoveDependency("a", "b");
+            Assert.IsFalse(t.HasDependents("a"));
+        }
+
+        [TestMethod()]
+        public void testGetEmptyDependents()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("c", "b");
+            t.RemoveDependency("a", "b");
+            IEnumerable<String> arr = t.GetDependents("r");
+            int i = arr.Count();
+            Assert.IsTrue(i == 0);
+        }
+
+        [TestMethod()]
+        public void testGetEmptyDependees()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("c", "b");
+            t.RemoveDependency("a", "b");
+            IEnumerable<String> arr = t.GetDependees("r");
+            int i = arr.Count();
+            Assert.IsTrue(i == 0);
         }
     }
 }

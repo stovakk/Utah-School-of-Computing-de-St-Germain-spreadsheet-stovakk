@@ -193,30 +193,20 @@ namespace DependencyGraph
         /// <param name="t"></param>
         public void RemoveDependency(string s, string t)
         {
-            int count = 0;
-            if (dependents.ContainsKey(s))
+            if (dependents.ContainsKey(s) && dependees.ContainsKey(t))
             {
                 dependents[s].Remove(t);
-                count++;
 
                 if (dependents[s].Count == 0)
                 {
                     dependents.Remove(s);
                 }
-            }
 
-            if (dependees.ContainsKey(t))
-            {
                 dependees[t].Remove(s);
-                count++;
                 if (dependees[t].Count == 0)
                 {
                     dependees.Remove(t);
                 }
-            }
-
-            if (count > 0)
-            {
                 pairs--;
             }
 
