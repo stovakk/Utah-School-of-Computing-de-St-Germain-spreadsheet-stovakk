@@ -227,6 +227,9 @@ namespace DependencyGraphTests
             }
         }
 
+        /// <summary>
+        /// Duplicate add shouldn't work
+        /// </summary>
         [TestMethod()]
         public void testDuplicate()
         {
@@ -237,6 +240,9 @@ namespace DependencyGraphTests
             Assert.IsTrue(t.Size == 1);
         }
 
+        /// <summary>
+        /// Testing "This" method
+        /// </summary>
         [TestMethod()]
         public void testThisMethodMany()
         {
@@ -253,6 +259,9 @@ namespace DependencyGraphTests
             Assert.IsTrue(t["b"] == 6);
         }
 
+        /// <summary>
+        /// Testing "This" method empty
+        /// </summary>
         [TestMethod()]
         public void testThisMethodNone()
         {
@@ -269,6 +278,9 @@ namespace DependencyGraphTests
             Assert.IsTrue(t["r"] == 0);
         }
 
+        /// <summary>
+        /// Testing has Dependnts True
+        /// </summary>
         [TestMethod()]
         public void testHasDependentsTrue()
         {
@@ -279,6 +291,9 @@ namespace DependencyGraphTests
             Assert.IsFalse(t.HasDependents("b"));
         }
 
+        /// <summary>
+        /// Testing HasDependents False
+        /// </summary>
         [TestMethod()]
         public void testHasDependentsFalse()
         {
@@ -289,6 +304,9 @@ namespace DependencyGraphTests
             Assert.IsFalse(t.HasDependents("b"));
         }
 
+        /// <summary>
+        /// Testing has Dependees True
+        /// </summary>
         [TestMethod()]
         public void testHasDependeesTrue()
         {
@@ -301,6 +319,9 @@ namespace DependencyGraphTests
             Assert.IsTrue(t.Size == 3);
         }
 
+        /// <summary>
+        /// Testing size is zero
+        /// </summary>
         [TestMethod()]
         public void testSizeZero()
         {
@@ -308,6 +329,9 @@ namespace DependencyGraphTests
             Assert.IsTrue(t.Size == 0);
         }
 
+        /// <summary>
+        /// Testing size after remove, should be one lower
+        /// </summary>
         [TestMethod()]
         public void testSizeAfterRemove()
         {
@@ -320,6 +344,9 @@ namespace DependencyGraphTests
             Assert.IsTrue(t.Size == 0);
         }
 
+        /// <summary>
+        /// Testing removing something that doesn't exist
+        /// </summary>
         [TestMethod()]
         public void testRemoveNA()
         {
@@ -332,6 +359,9 @@ namespace DependencyGraphTests
             Assert.IsTrue(t.Size == 2);
         }
 
+        /// <summary>
+        /// Testing adding duplicate
+        /// </summary>
         [TestMethod()]
         public void testAddNA()
         {
@@ -342,6 +372,9 @@ namespace DependencyGraphTests
             Assert.IsTrue(t.Size == 2);
         }
 
+        /// <summary>
+        /// Testing has Dependees false
+        /// </summary>
         [TestMethod()]
         public void testHasDependeesFalse()
         {
@@ -352,6 +385,9 @@ namespace DependencyGraphTests
             Assert.IsFalse(t.HasDependees("c"));
         }
 
+        /// <summary>
+        /// Testing removing the last num in dependency
+        /// </summary>
         [TestMethod()]
         public void testRemoveLastNum()
         {
@@ -363,6 +399,9 @@ namespace DependencyGraphTests
             Assert.IsFalse(t.HasDependents("a"));
         }
 
+        /// <summary>
+        /// Testing size of NA dependents chain
+        /// </summary>
         [TestMethod()]
         public void testGetEmptyDependents()
         {
@@ -376,6 +415,9 @@ namespace DependencyGraphTests
             Assert.IsTrue(i == 0);
         }
 
+        /// <summary>
+        /// Testing NA dependees list
+        /// </summary>
         [TestMethod()]
         public void testGetEmptyDependees()
         {

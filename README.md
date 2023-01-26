@@ -3,18 +3,18 @@ Partner:   None
 Date:      18-Jan-2023
 Course:    CS 3500, University of Utah, School of Computing
 GitHub ID: Stovakk
-Date:	   18-Jan-2023
-Solution:  FormulaEvaluator
+Date:	   26-Jan-2023
+Solution:  Spreadsheet
 Copyright: CS 3500 and Nate Stovak, 
 
 The Solution is currently capable of evalutaing mathematical expressions and also testing them in many cases
 to make sure the evalutation method is correct. Along with the capability to produce a dependency graph of associated
 cells when they are implemented
 
-I believe this project will take me about 10 hours to fully create, and test. It would take me less however I believe
-using a new language, delegates which are new to me, and Visual Stuidos/GitHub will take time to get used to. 
-This project took me about 9.5 hours to complete the full solution of evaluation and testing. The dependency graph should
-take about 8 hours I believe, and I have finished it in about 7 hours
+
+Hours Estimated/Worked         Assignment                       Note
+         9.5  /   10    - Assignment 1 - Formula Evaluator     Spent 5 hours fighting Git and Visual Studios
+         7    /   8     - Assignment 2 - Dependency Graph      Spent 4 hours on project, 2 creating tests/debugging, 1 documentation
 
 No known bugs or deficiencies, stands on it's own.
 
