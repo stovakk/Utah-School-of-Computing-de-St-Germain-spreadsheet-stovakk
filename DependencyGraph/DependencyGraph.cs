@@ -10,7 +10,8 @@ using System.Linq;
 using System.Text;
 
 
-namespace DependencyGraph
+namespace SpreadsheetUtilities
+
 {
     /// <summary>
     /// (s1,t1) is an ordered pair of strings

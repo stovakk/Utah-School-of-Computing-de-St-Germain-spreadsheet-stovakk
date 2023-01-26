@@ -21,7 +21,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void SimpleEmptyTest()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             Assert.AreEqual(0, t.Size);
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void SimpleEmptyRemoveTest()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("x", "y");
             Assert.AreEqual(1, t.Size);
             t.RemoveDependency("x", "y");
@@ -42,7 +42,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void EmptyEnumeratorTest()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("x", "y");
             IEnumerator<string> e1 = t.GetDependees("y").GetEnumerator();
             Assert.IsTrue(e1.MoveNext());
@@ -60,7 +60,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void SimpleReplaceTest()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("x", "y");
             Assert.AreEqual(t.Size, 1);
             t.RemoveDependency("x", "y");
@@ -73,8 +73,8 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void StaticTest()
         {
-            DependencyGraph.DependencyGraph t1 = new DependencyGraph.DependencyGraph();
-            DependencyGraph.DependencyGraph t2 = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t1 = new SpreadsheetUtilities.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t2 = new SpreadsheetUtilities.DependencyGraph();
             t1.AddDependency("x", "y");
             Assert.AreEqual(1, t1.Size);
             Assert.AreEqual(0, t2.Size);
@@ -85,7 +85,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void SizeTest()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("a", "c");
             t.AddDependency("c", "b");
@@ -98,7 +98,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void EnumeratorTest()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("a", "c");
             t.AddDependency("c", "b");
@@ -127,7 +127,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void ReplaceThenEnumerate()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("x", "b");
             t.AddDependency("a", "z");
             t.ReplaceDependents("b", new HashSet<string>());
@@ -161,7 +161,7 @@ namespace DependencyGraphTests
         public void StressTest()
         {
             // Dependency graph
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             // A bunch of strings to use
             const int SIZE = 200;
             string[] letters = new string[SIZE];
@@ -233,7 +233,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testDuplicate()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("a", "b");
             Assert.IsFalse(t.Size == 2);
@@ -246,7 +246,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testThisMethodMany()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("c", "b");
             t.AddDependency("d", "b");
@@ -265,7 +265,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testThisMethodNone()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("c", "b");
             t.AddDependency("d", "b");
@@ -284,7 +284,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testHasDependentsTrue()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("c", "b");
             Assert.IsTrue(t.HasDependents("a"));
@@ -297,7 +297,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testHasDependentsFalse()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("d", "b");
             t.AddDependency("r", "b");
             Assert.IsTrue(t.HasDependents("d"));
@@ -310,7 +310,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testHasDependeesTrue()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("c", "b");
             t.AddDependency("", "");
@@ -325,7 +325,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testSizeZero()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             Assert.IsTrue(t.Size == 0);
         }
 
@@ -335,7 +335,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testSizeAfterRemove()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.RemoveDependency("a", "b");
@@ -350,7 +350,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testRemoveNA()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.RemoveDependency("c", "b");
@@ -365,7 +365,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testAddNA()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.AddDependency("b", "b");
@@ -378,7 +378,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testHasDependeesFalse()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.AddDependency("c", "b");
@@ -391,7 +391,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testRemoveLastNum()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.AddDependency("c", "b");
@@ -405,7 +405,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testGetEmptyDependents()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.AddDependency("c", "b");
@@ -421,7 +421,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testGetEmptyDependees()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.AddDependency("c", "b");
@@ -434,7 +434,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testCopyOfGetDependeesFalse()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.AddDependency("c", "b");
@@ -446,7 +446,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testCopyOfGetDependeesTrue()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.AddDependency("c", "b");
@@ -457,7 +457,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testCopyOfGetDependentsTrue()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.AddDependency("c", "b");
@@ -468,7 +468,7 @@ namespace DependencyGraphTests
         [TestMethod()]
         public void testCopyOfGetDependentsFalse()
         {
-            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            SpreadsheetUtilities.DependencyGraph t = new SpreadsheetUtilities.DependencyGraph();
             t.AddDependency("a", "b");
             t.AddDependency("b", "b");
             t.AddDependency("c", "b");
