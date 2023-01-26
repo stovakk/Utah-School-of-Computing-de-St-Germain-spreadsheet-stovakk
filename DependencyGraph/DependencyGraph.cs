@@ -80,7 +80,7 @@ namespace DependencyGraph
             {
                 if (dependees.ContainsKey(s))
                 {
-                    return dependees.Count;
+                    return dependees[s].Count;
                 }
                 else
                 {
@@ -161,15 +161,13 @@ namespace DependencyGraph
                 dependents[s].Add(t);
                 dependees[t].Add(s);
             }
-            else if (dependents.ContainsKey(s) && dependees.ContainsKey(t))
+            else if (dependents.ContainsKey(s) && dependees.ContainsKey(t) && dependents[s].Contains(t))
             {
-                dependents[s].Add(t);
-                dependees[t].Add(s);
+                return;
             }
             else if (dependents.ContainsKey(s) && !dependees.ContainsKey(t))
             {
                 HashSet<String> newDependees = new HashSet<String>();
-                Console.WriteLine("here");
                 dependents[s].Add(t);
                 dependees.Add(t, newDependees);
                 dependees[t].Add(s);
@@ -183,7 +181,8 @@ namespace DependencyGraph
             }
             else
             {
-                return;
+                dependents[s].Add(t);
+                dependees[t].Add(s);
             }
             pairs++;
         }
@@ -194,12 +193,33 @@ namespace DependencyGraph
         /// <param name="t"></param>
         public void RemoveDependency(string s, string t)
         {
-            if (dependents.ContainsKey(s) && dependents[s].Contains(t))
+            int count = 0;
+            if (dependents.ContainsKey(s))
             {
-                dependents[s].Remove(t); 
+                dependents[s].Remove(t);
+                count++;
+
+                if (dependents[s].Count == 0)
+                {
+                    dependents.Remove(s);
+                }
+            }
+
+            if (dependees.ContainsKey(t))
+            {
                 dependees[t].Remove(s);
+                count++;
+                if (dependees[t].Count == 0)
+                {
+                    dependees.Remove(t);
+                }
+            }
+
+            if (count > 0)
+            {
                 pairs--;
             }
+
         }
         /// <summary>
         /// Removes all existing ordered pairs of the form (s,r).  Then, for each
@@ -227,21 +247,21 @@ namespace DependencyGraph
         /// </summary>
         public void ReplaceDependees(string s, IEnumerable<string> newDependees)
         {
+
+            if (dependees.ContainsKey(s))
+            {
                 HashSet<String> replace = dependees[s];
                 foreach (string r in replace)
                 {
-                    dependents[r].Remove(s);
-                    dependees[s].Remove(r);
-                    pairs--;
+                    RemoveDependency(r, s);
                 }
-            
+            }
 
             foreach (string t in newDependees)
             {
-                dependents[t].Add(s);
-                dependees[s].Add(t);
-                pairs++;
+                AddDependency(t, s);
             }
+           
         }
     }
 }

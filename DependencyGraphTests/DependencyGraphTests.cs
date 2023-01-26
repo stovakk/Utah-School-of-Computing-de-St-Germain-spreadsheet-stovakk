@@ -224,6 +224,78 @@ namespace DependencyGraphTests
         HashSet<string>(t.GetDependees(letters[i]))));
             }
         }
+
+        [TestMethod()]
+        public void testDuplicate()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("a", "b");
+            Assert.IsFalse(t.Size == 2);
+            Assert.IsTrue(t.Size == 1);
+        }
+
+        [TestMethod()]
+        public void testThisMethodMany()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("c", "b");
+            t.AddDependency("d", "b");
+            t.AddDependency("r", "b");
+            t.AddDependency("t", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("a", "t");
+            t.AddDependency("b", "q");
+            t.AddDependency("b", "e");
+            Assert.IsTrue(t["b"] == 6);
+        }
+
+        [TestMethod()]
+        public void testThisMethodNone()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("c", "b");
+            t.AddDependency("d", "b");
+            t.AddDependency("r", "b");
+            t.AddDependency("t", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("a", "t");
+            t.AddDependency("b", "q");
+            t.AddDependency("b", "e");
+            Assert.IsTrue(t["r"] == 0);
+        }
+
+        [TestMethod()]
+        public void testHasDependentsTrue()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("c", "b");
+            Assert.IsTrue(t.HasDependents("a"));
+            Assert.IsFalse(t.HasDependents("b"));
+        }
+
+        [TestMethod()]
+        public void testHasDependentsFalse()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("d", "b");
+            t.AddDependency("r", "b");
+            Assert.IsTrue(t.HasDependents("d"));
+            Assert.IsFalse(t.HasDependents("b"));
+        }
+
+        [TestMethod()]
+        public void testHasDependeesTrue()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("c", "b");
+            Assert.IsTrue(t.HasDependees("b"));
+            Assert.IsFalse(t.HasDependees("a"));
+        }
     }
 }
 
