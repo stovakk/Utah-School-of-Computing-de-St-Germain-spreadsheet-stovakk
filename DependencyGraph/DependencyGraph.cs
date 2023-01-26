@@ -46,6 +46,7 @@ namespace DependencyGraph
     /// </summary>
     public class DependencyGraph
     {
+        //Private instance methods we will use in the class
         private Dictionary<String, HashSet<String>> dependents;
         private Dictionary<String, HashSet<String>> dependees;
         private int pairs;
@@ -124,8 +125,9 @@ namespace DependencyGraph
             {
                 return new HashSet<String>();
             }
-            HashSet<String> result = dependents[s];
-            return result;
+            String[] results = new string[dependents[s].Count];
+            dependents[s].CopyTo(results);
+            return results;
         }
         /// <summary>
         /// Enumerates dependees(s).
@@ -136,8 +138,9 @@ namespace DependencyGraph
             {
                 return new HashSet<String>();
             }
-            HashSet<String> result = dependees[s];
-            return result;
+            String[] results = new string[dependees[s].Count];
+            dependees[s].CopyTo(results);
+            return results;
         }
         /// <summary>
         /// <para>Adds the ordered pair (s,t), if it doesn't exist</para>
@@ -151,8 +154,11 @@ namespace DependencyGraph
         /// <param name="t"> t cannot be evaluated until s is</param>        /// 
         public void AddDependency(string s, string t)
         {
+            // if neither dependent or dependee exist in the Dictionaries
             if (!dependents.ContainsKey(s) && !dependees.ContainsKey(t))
             {
+                // creates two new hashSet's, adds them to their assigned 
+                // s and t location, and adds their adversary accordingly
                 HashSet<String> newDependents = new HashSet<String>();
                 HashSet<String> newDependees = new HashSet<String>();
                 dependents.Add(s, newDependents);
@@ -160,29 +166,36 @@ namespace DependencyGraph
                 dependents[s].Add(t);
                 dependees[t].Add(s);
             }
+            // if the dependency exits in the set, return and don't do anything
             else if (dependents.ContainsKey(s) && dependees.ContainsKey(t) && dependents[s].Contains(t))
             {
                 return;
             }
+            // if dependents hashset exists and dependees does not
             else if (dependents.ContainsKey(s) && !dependees.ContainsKey(t))
             {
+                // then add new hashset to dependees, and add it to the according spot
                 HashSet<String> newDependees = new HashSet<String>();
                 dependents[s].Add(t);
                 dependees.Add(t, newDependees);
                 dependees[t].Add(s);
             }
+            // if dependees hashset exists, and dependents does not
             else if (!dependents.ContainsKey(s) && dependees.ContainsKey(t))
             {
+                // then add new hashset to dependetns, and add it to the according spot
                 HashSet<String> newDependents = new HashSet<String>();
                 dependents.Add(s, newDependents);
                 dependents[s].Add(t);
                 dependees[t].Add(s);
             }
+            // else if dependees and dependents both have hashset's, but it doesn't exist in either
             else
             {
                 dependents[s].Add(t);
                 dependees[t].Add(s);
             }
+            // adds pair only if it doesn't already exist
             pairs++;
         }
         /// <summary>
@@ -192,20 +205,25 @@ namespace DependencyGraph
         /// <param name="t"></param>
         public void RemoveDependency(string s, string t)
         {
+            // if the dependency to remove exits where it should in both dependents and dependees
             if (dependents.ContainsKey(s) && dependees.ContainsKey(t))
             {
                 dependents[s].Remove(t);
 
+                // if the dependents list is now empty, remove it
                 if (dependents[s].Count == 0)
                 {
                     dependents.Remove(s);
                 }
 
                 dependees[t].Remove(s);
+
+                //if the dependees list is now empty, remove it
                 if (dependees[t].Count == 0)
                 {
                     dependees.Remove(t);
                 }
+                // if it removed something, it will lower the pairs by 1
                 pairs--;
             }
 
@@ -216,6 +234,7 @@ namespace DependencyGraph
         /// </summary>
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
+            // if dependents contains the key, it will remove all dependees associated with it
             if (dependents.ContainsKey(s))
             {
                 HashSet<String> replace = dependents[s];
@@ -225,6 +244,7 @@ namespace DependencyGraph
                 }
             }
 
+            // for each string in newDependents it will be added to Dependents
             foreach (string t in newDependents)
             {
                 AddDependency(s, t);
@@ -237,15 +257,20 @@ namespace DependencyGraph
         public void ReplaceDependees(string s, IEnumerable<string> newDependees)
         {
 
+            // if dependees contains the key, it will remove all dependees associated with it
             if (dependees.ContainsKey(s))
             {
                 HashSet<String> replace = dependees[s];
+                // removes all dependencys in the dependees set by 
+                // using the remove dependency backwards as it works the same way
                 foreach (string r in replace)
                 {
                     RemoveDependency(r, s);
                 }
             }
 
+            // for each string in newDependents it will be added to Dependees,
+            // which is done by adding dependency backwards
             foreach (string t in newDependees)
             {
                 AddDependency(t, s);

@@ -430,6 +430,52 @@ namespace DependencyGraphTests
             int i = arr.Count();
             Assert.IsTrue(i == 0);
         }
+
+        [TestMethod()]
+        public void testCopyOfGetDependeesFalse()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("c", "b");
+            IEnumerable<String> result = t.GetDependees("b");
+            t.AddDependency("r", "b");
+            Assert.AreNotEqual(result, t.GetDependees("b"));
+        }
+
+        [TestMethod()]
+        public void testCopyOfGetDependeesTrue()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("c", "b");
+            IEnumerable<String> result = t.GetDependees("b");
+            Assert.AreNotEqual(result, t.GetDependees("b"));
+        }
+
+        [TestMethod()]
+        public void testCopyOfGetDependentsTrue()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("c", "b");
+            IEnumerable<String> result = t.GetDependents("b");
+            Assert.AreNotEqual(result, t.GetDependents("b"));
+        }
+
+        [TestMethod()]
+        public void testCopyOfGetDependentsFalse()
+        {
+            DependencyGraph.DependencyGraph t = new DependencyGraph.DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("b", "b");
+            t.AddDependency("c", "b");
+            IEnumerable<String> result = t.GetDependents("b");
+            t.AddDependency("b", "r");
+            Assert.AreNotEqual(result, t.GetDependents("b"));
+        }
     }
 }
 
