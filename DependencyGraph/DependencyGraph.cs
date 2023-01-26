@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-//Represent a graph, Dependents/dependees methods are O(1)
 
 namespace DependencyGraph
 {
