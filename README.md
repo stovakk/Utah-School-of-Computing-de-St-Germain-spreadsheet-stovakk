@@ -8,11 +8,13 @@ Solution:  FormulaEvaluator
 Copyright: CS 3500 and Nate Stovak, 
 
 The Solution is currently capable of evalutaing mathematical expressions and also testing them in many cases
-to make sure the evalutation method is correct.
+to make sure the evalutation method is correct. Along with the capability to produce a dependency graph of associated
+cells when they are implemented
 
 I believe this project will take me about 10 hours to fully create, and test. It would take me less however I believe
 using a new language, delegates which are new to me, and Visual Stuidos/GitHub will take time to get used to. 
-This project took me about 9.5 hours to complete the full solution of evaluation and testing
+This project took me about 9.5 hours to complete the full solution of evaluation and testing. The dependency graph should
+take about 8 hours I believe, and I have finished it in about 7 hours
 
 No known bugs or deficiencies, stands on it's own.
 
