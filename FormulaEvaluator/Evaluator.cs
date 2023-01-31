@@ -50,6 +50,10 @@ namespace FormulaEvaluator
         {
             // The following lines split the String into tokens in an array
             // to be iterated over
+            if(expression.Equals(""))
+            {
+                throw new ArgumentException();
+            }
             string[] substrings =
                     Regex.Split(expression, "(\\()|(\\))|(-)|(\\+)|(\\*)|(/)");
             Stack<int> numStack = new Stack<int>();
@@ -67,6 +71,10 @@ namespace FormulaEvaluator
                 {
                     continue;
                 }
+                if(s == "xx")
+                {
+                    throw new ArgumentException();
+                }
                 // takes out the blank spaces
                 s = s.Replace(" ", "");
 
@@ -77,8 +85,7 @@ namespace FormulaEvaluator
                     numStack.Push(value1);
                 }
 
-                //To Do: add Delegate work
-                else if (Regex.IsMatch(s, @"\w+", RegexOptions.IgnoreCase))
+                else if (Regex.IsMatch(s, @"[a-zA-Z]+\d+"))
                 {
                     value3 = variableEvaluator(s);
                     value1 = IntegerEvaluation(value3, opStack, numStack);
@@ -182,7 +189,7 @@ namespace FormulaEvaluator
 
                             value1 = numStack.Pop();
                             value2 = numStack.Pop();
-                            currentSum = value1 - value2;
+                            currentSum = value2 - value1;
 
                             numStack.Push(currentSum);
                         }
