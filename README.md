@@ -15,6 +15,7 @@ cells when they are implemented
 Hours Estimated/Worked         Assignment                       Note
          9.5  /   10    - Assignment 1 - Formula Evaluator     Spent 5 hours fighting Git and Visual Studios
          7    /   8     - Assignment 2 - Dependency Graph      Spent 4 hours on project, 2 creating tests/debugging, 1 documentation
+         ?    /   10    - Assignment 3 - Formula
 
 No known bugs or deficiencies, stands on it's own.
 
