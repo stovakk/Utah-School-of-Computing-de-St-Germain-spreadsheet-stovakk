@@ -47,8 +47,7 @@ namespace SpreadsheetUtilities
     /// </summary>
     public class Formula
     {
-        private String[] formulaTokens;
-        private Func<string, string> normalizer;
+        private List<String> formulaTokens;
         private HashSet<String> normalVars;
         /// <summary>
         /// Creates a Formula from a string that consists of an infix expression written as
@@ -87,31 +86,30 @@ namespace SpreadsheetUtilities
         /// </summary>
         public Formula(String formula, Func<string, string> normalize, Func<string, bool> isValid)
         {
-            normalizer = normalize;
-
-            formulaTokens =
-        Regex.Split(formula, "(\\()|(\\))|(-)|(\\+)|(\\*)|(/)");
-
+            // initiating all the IEnumberables we will use throughout
+            formulaTokens = GetTokens(formula).ToList();
             normalVars = new HashSet<String>();
 
-            if (formulaTokens.Length == 0)
+            // if formula is empty, throw exception
+            if (formulaTokens.Count() == 0)
             {
                 throw new FormulaFormatException("Invalid Formula, formula has no tokens in it");
             }
 
+            // initiating all the variables we will use 
             int openParentheses = 0;
             int closedParentheses = 0;
-            double tokenValue = 0;
-            String previousToken = "";
+            double tokenValue;
+            String previousToken = null;
 
-            for (int i = 0; i < formulaTokens.Length; i++)
+            for (int i = 0; i < formulaTokens.Count(); i++)
             {
-                String token = formulaTokens[i];
+                String token = formulaTokens.ElementAt(i);
 
                 // if its the first token, it must be a valid variable, number, or open parentheses
                 if (i == 0)
                 {
-                    if (!(isValid(normalize(token)) || double.TryParse(token, out tokenValue) || token.Equals("(")))
+                    if (!(Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*") || double.TryParse(token, out tokenValue) || token.Equals("(")))
                     {
                         throw new FormulaFormatException("Invalid start to fomula, must begin with " +
                             "valid variable, number, or (");
@@ -123,34 +121,48 @@ namespace SpreadsheetUtilities
                 {
                     openParentheses++;
                 }
+                
                 else if (token.Equals(")"))
                 {
                     closedParentheses++;
+                    // if there are ever more closed parentheses than open ones, throw exception
                     if (closedParentheses > openParentheses)
                     {
                         throw new FormulaFormatException("Invalid formula, cannot have more closed" +
                             "parentheses than open parentheses");
                     }
                 }
+                //
                 else if (token.Equals("+") || token.Equals("-") || token.Equals("*") || token.Equals("/"))
-                { }
+                {}
+                // if it's a number, add the toString version to the formulaTokens
+                // so it's easier to use .equals later on
                 else if (double.TryParse(token, out tokenValue))
                 { this.formulaTokens[i] = tokenValue.ToString(); }
-                else if (isValid(normalize(token)))
+                // if Variable is in the right format, and works when normalized, then add it to the 
+                // formulaTokens so it's easier later on, and also to the hashSet of variables
+                else if (Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*"))
                 {
-                    normalVars.Add(normalize(token));
-                    this.formulaTokens[i] = normalize(token);
+                    if (isValid(normalize(token)) && Regex.IsMatch(normalize(token), @"[a-zA-Z_](?: [a-zA-Z_]|\d)*"))
+                    {
+                        normalVars.Add(normalize(token));
+                        this.formulaTokens[i] = normalize(token);
+                    }
+                    else throw new FormulaFormatException("Invalid formula, a variable is invalid");
                 }
+                // else it's something that we don't want
                 else
                 {
-                    throw new FormulaFormatException("Infalid formula, at least one of the tokens in your" +
+                    throw new FormulaFormatException("Invalid formula, at least one of the tokens in your" +
                         "formula is invalid");
                 }
 
                 // if the last token doesn't have a valid input, throw an exception
-                if (i == formulaTokens.Length - 1)
+                if (i == formulaTokens.Count - 1)
                 {
-                    if (!(isValid(normalize(token)) || double.TryParse(token, out tokenValue) || token.Equals("(")))
+                    //if the last input is not a variable, number, or ) throw an exception
+                    if (!(Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*", RegexOptions.Singleline) || 
+                        double.TryParse(token, out tokenValue) || token.Equals(")")))
                     {
                         throw new FormulaFormatException("Invalid formula, must end in " +
                             "valid variable, number, or )");
@@ -163,25 +175,35 @@ namespace SpreadsheetUtilities
                     }
                 }
 
-                if (previousToken.Equals("(") || previousToken.Equals("+") || previousToken.Equals("-")
-                    || previousToken.Equals("*") || previousToken.Equals("/"))
+                // checks previous tokens to current tokens
+                if (previousToken != null && previousToken != "")
                 {
-                    if (!(double.TryParse(token, out tokenValue) || isValid(normalize(token)) || token.Equals(")")))
+                    // if the previous token was an operand or an open parentheses, the next token must be a 
+                    // variable, number, or open parentheses
+                    if (previousToken.Equals("(") || previousToken.Equals("+") || previousToken.Equals("-")
+                        || previousToken.Equals("*") || previousToken.Equals("/"))
                     {
-                        throw new FormulaFormatException("Invalid formula, after an opened parentheses" +
-                            "or an operator (+,-,*,/), a number, variable, or opened parentheses must follow");
+                        if (!(Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*") || double.TryParse(token, out _) || token.Equals("(")))
+                        {
+                            throw new FormulaFormatException("Invalid formula, after an opened parentheses" +
+                                " or an operator (+,-,*,/), a number, variable, or opened parentheses must follow");
+                        }
                     }
-                }
-                else if (double.TryParse(token, out tokenValue) || isValid(normalize(previousToken)) || previousToken.Equals(")"))
-                {
-                    if (!(token.Equals("+") || token.Equals("-") || token.Equals("*") || token.Equals("/")
-                           || token.Equals(")")))
+                    // if the previous token was a number, variable, or closed parentheses, the next token must be an
+                    // operand or closed parentheses
+                    else if (double.TryParse(previousToken, out tokenValue) || (Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*")
+                             || previousToken.Equals(")")))
                     {
-                        throw new FormulaFormatException("Invalid formula, after a valid number, variable" +
-                            "or closed parentheses, an operand (+,-,*,/) or closed parentheses must follow");
+                        if (!(token.Equals("+") || token.Equals("-") || token.Equals("*") || token.Equals("/")
+                               || token.Equals(")")))
+                        {
+                            throw new FormulaFormatException("Invalid formula, after a valid number, variable" +
+                                " or closed parentheses, an operand (+,-,*,/) or closed parentheses must follow");
+                        }
                     }
                 }
 
+                // sets previous token to current token for next time
                 previousToken = token;
             }
         }
@@ -209,53 +231,84 @@ namespace SpreadsheetUtilities
         /// </summary>
         public object Evaluate(Func<string, double> lookup)
         {
-
-            Stack<String> opStack = new Stack<String>();
-            Stack<double> numStack = new Stack<double>();
-
-            foreach (String token in formulaTokens)
+            // try catch to catch exceptions
+            try
             {
-                if (double.TryParse(token, out double tokenValue))
-                {
-                    doubleEvaluation(tokenValue, opStack, numStack);
-                }
-                else if(token.Equals("+") || token.Equals("-"))
-                {
-                    plusMinusEvaluation(token, opStack, numStack);
-                }
-                else if(token.Equals("*") || token.Equals("/") || token.Equals("("))
-                {
-                    opStack.Push(token);
-                }
-                else if(token.Equals(")"))
-                {
-                    plusMinusEvaluation(token, opStack, numStack);
 
-                    opStack.Pop();
+                // inititating operator and number stack
+                Stack<String> opStack = new Stack<String>();
+                Stack<double> numStack = new Stack<double>();
 
-                    multiplyDivideEvaluation(opStack, numStack);
-                }
-                else
+                // go through all tokens
+                foreach (String token in formulaTokens)
                 {
-                    double value = lookup(normalizer(token));
-                    doubleEvaluation(value, opStack, numStack);
-                }
-            }
+                    // if the token is a number, treat it as so
+                    if (double.TryParse(token, out double tokenValue))
+                    {
+                        doubleEvaluation(tokenValue, opStack, numStack);
+                    }
+                    // if the token is a plus or minus, treat it as so
+                    else if (token.Equals("+") || token.Equals("-"))
+                    {
+                        plusMinusEvaluation(token, opStack, numStack);
+                    }
+                    // if the token is a multiplication or division sign or an opened parentheses, treat it as so
+                    else if (token.Equals("*") || token.Equals("/") || token.Equals("("))
+                    {
+                        opStack.Push(token);
+                    }
+                    // if the token is a closed parentheses, treat it as one
+                    else if (token.Equals(")"))
+                    {
+                        plusMinusEvaluation(token, opStack, numStack);
 
-            if (opStack.Count > 0)
+                        // this will be an opened parentheses
+                        opStack.Pop();
+
+                        multiplyDivideEvaluation(opStack, numStack);
+                    }
+                    // else it is a variable
+                    else
+                    {
+                        double value = lookup(token);
+                        doubleEvaluation(value, opStack, numStack);
+                    }
+                }
+
+                // if this occurs it is a plus or minus sign
+                if (opStack.Count > 0)
+                {
+                    plusMinusEvaluation("0", opStack, numStack);
+                }
+
+                return numStack.Pop();
+
+            } 
+            // happens if the lookup deleagate can't find an associating value
+            catch(ArgumentException e)
             {
-                plusMinusEvaluation("0", opStack, numStack);
+                return new FormulaError("Invalid Formula, a variable is invalid");
             }
-            
-            return opStack.Pop();
+            // happens when divide by zero occurs
+            catch(DivideByZeroException e)
+            {
+                return new FormulaError("Invalid Formula, divide by zero");
+            }
+        
         }
 
+        /// <summary>
+        /// Helper method for when a number is found, checks to see if the operator stack
+        /// has a multiply or divide sign, and uses it if it does. Otherwise it pushs the new token
+        /// </summary>
+        /// <param name="token"> token we just got</param>
+        /// <param name="opStack"> operator stack</param>
+        /// <param name="numStack"> number stack</param>
+        /// <exception cref="DivideByZeroException"> if divide by zero occurs</exception>
         private void doubleEvaluation(double token, Stack<String> opStack, Stack<double> numStack)
         {
             if (opStack.Count > 0 && (opStack.Peek().Equals("*") || opStack.Peek().Equals("/")))
             {
-                if (numStack.Count < 1)
-                    throw new FormulaFormatException("Invalid Formula, need two numbers to mulitply/divide");
                 if (opStack.Peek() == "*")
                 {
                     String op = opStack.Pop();
@@ -268,8 +321,7 @@ namespace SpreadsheetUtilities
                 {
                     String op = opStack.Pop();
                     double value2 = numStack.Pop();
-                    if (token == 0)
-                        throw new FormulaFormatException("Invalid Formula, cannot divide by 0");
+                    if (token == 0) throw new DivideByZeroException();
                     double value3 = value2 / token;
                     numStack.Push(value3);
                     return;
@@ -278,36 +330,46 @@ namespace SpreadsheetUtilities
             numStack.Push(token);
         }
 
+        /// <summary>
+        /// Helper method for when plus or minus token is found. First it checks to 
+        /// see if there is another plus or minus sign at the top of the operator stack and
+        /// does what it needs to do if so and push's the new number. Then regardless of the 
+        /// previous step it pushes the operand to the stack
+        /// </summary>
+        /// <param name="token"> new plus or minus sign </param>
+        /// <param name="opStack"> operator stack </param>
+        /// <param name="numStack"> number stack </param>
         private void plusMinusEvaluation(String token, Stack<String> opStack, Stack<double> numStack)
         {
             if (opStack.Count > 0 && (opStack.Peek().Equals("+") || opStack.Peek().Equals("-")))
             {
-                // if expression won't evaluate, throw exception
-                if (numStack.Count < 2)
-                {
-                    throw new FormulaFormatException("Invalid formula, need two numbers/variables for addition or subtraction");
-                }
-
                 double value1 = numStack.Pop();
                 double value2 = numStack.Pop();
                 String op = opStack.Pop();
 
-                //if token is plus, finds the sum
+                //if token is plus, finds the sum, else subtract
                 if (op.Equals("+")) 
                     numStack.Push(value2 + value1);
                 else 
                     numStack.Push(value2 - value1);
             }
-
-            opStack.Push(token);
+            
+            // if the token is a closed parentheses, don't add it to the stack
+            if(token != ")")    opStack.Push(token);
         }
 
+        /// <summary>
+        /// If new token is closed parentheses, this method calls, it's to check to see
+        /// if at the top of the oeprator stack there is a multiplication or division sign 
+        /// and if so it does what the sign tells it to do
+        /// </summary>
+        /// <param name="opStack"> operator stack </param>
+        /// <param name="numStack"> number stack </param>
+        /// <exception cref="DivideByZeroException"> if division by zero occurs </exception>
         private void multiplyDivideEvaluation(Stack<String> opStack, Stack<double> numStack)
         {
-            if (opStack.Count > 0 && (opStack.Peek().Equals("*") || opStack.Peek().Equals("/")) && numStack.Count > 2)
+            if (opStack.Count > 0 && (opStack.Peek().Equals("*") || opStack.Peek().Equals("/")) && numStack.Count >= 2)
             {
-                if (numStack.Count < 2)
-                    throw new FormulaFormatException("Invalid Formula, need 2 numbers to divide or multiply");
                 if (opStack.Peek().Equals("*"))
                 {
                     String op = opStack.Pop();
@@ -320,9 +382,8 @@ namespace SpreadsheetUtilities
                 {
                     String op = opStack.Pop();
                     double value1 = numStack.Pop();
-                    if (value1 == 0)
-                        throw new FormulaFormatException("Invalid Formula, cannot divide by 0");
                     double value2 = numStack.Pop();
+                    if (value1 == 0) throw new DivideByZeroException();
                     double value3 = value2 / value1;
                     numStack.Push(value3);
                 }
@@ -358,6 +419,8 @@ namespace SpreadsheetUtilities
         /// </summary>
         public override string ToString()
         {
+            // all variables and doubles should be normalized
+            // so we can just add them in
             String toString = "";
             foreach(String token in this.formulaTokens)
             {
@@ -390,20 +453,28 @@ namespace SpreadsheetUtilities
         /// </summary>
         public override bool Equals(object? obj)
         {
-            Formula objFormula = new Formula( (string) obj);
+            // create new formuls with paramater, and initiate stings
+            Formula objFormula = new Formula(obj.ToString());
             String objFormula_curr;
             String thisFormula_curr;
 
-            for(int i = 0; i < this.formulaTokens.Length; i++)
+            // go through both formulas to see if they are equal
+            // if at any time they aren't equal, it returns false, true otherwise
+            for(int i = 0; i < this.formulaTokens.Count(); i++)
             {
-                objFormula_curr  = objFormula.formulaTokens[i];
-                thisFormula_curr = this.formulaTokens[i];
+                // get elements at their respective location
+                objFormula_curr  = objFormula.formulaTokens.ElementAt(i);
+                thisFormula_curr = this.formulaTokens.ElementAt(i);
 
+                // if the tokens are both numbers, check if the numbers are the same
                 if(double.TryParse(objFormula_curr, out double value1) && double.TryParse(thisFormula_curr, out double value2))
                 {
+                    // changes it into a toString() to make sure the floats will equal each other
                     if (value1.ToString() != value2.ToString())
                         return false;
                 }
+                // I don't have to normalize these current tokens as I already added the normalized ones to the 
+                // forula tokens in the constructor method
                 else if(objFormula_curr != thisFormula_curr)
                 {
                     return false;
@@ -419,7 +490,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public static bool operator == (Formula f1, Formula f2)
         {
-            return f1.Equals(f2);
+            return f1.Equals((Object) f2);
         }
 
         /// <summary>
@@ -429,6 +500,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public static bool operator !=(Formula f1, Formula f2)
         {
+            // if they are equal, then the operator is false
             if(f1 == f2)
             {
                 return false;
@@ -443,7 +515,12 @@ namespace SpreadsheetUtilities
         /// </summary>
         public override int GetHashCode()
         {
-            return this.ToString().GetHashCode();
+            int hashCode = 0;
+            foreach(var token in this.formulaTokens)
+            {
+                hashCode += token.GetHashCode();
+            }
+            return hashCode;
         }
 
         /// <summary>
