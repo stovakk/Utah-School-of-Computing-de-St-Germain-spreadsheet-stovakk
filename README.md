@@ -3,19 +3,20 @@ Partner:   None
 Date:      18-Jan-2023
 Course:    CS 3500, University of Utah, School of Computing
 GitHub ID: Stovakk
-Date:	   26-Jan-2023
+Date:	   2-Feb-2023
 Solution:  Spreadsheet
 Copyright: CS 3500 and Nate Stovak, 
 
 The Solution is currently capable of evalutaing mathematical expressions and also testing them in many cases
-to make sure the evalutation method is correct. Along with the capability to produce a dependency graph of associated
-cells when they are implemented
+to make sure the evalutation method is correct. The mathematical expression can now also normalize and ask the user
+what variables are valid, along with throw exceptions at the time they happen as to not waste the user's time.
+Along with the capability to produce a dependency graph of associated cells when they are implemented
 
 
 Hours Estimated/Worked         Assignment                       Note
          9.5  /   10    - Assignment 1 - Formula Evaluator     Spent 5 hours fighting Git and Visual Studios
          7    /   8     - Assignment 2 - Dependency Graph      Spent 4 hours on project, 2 creating tests/debugging, 1 documentation
-         ?    /   10    - Assignment 3 - Formula
+         9    /   10    - Assignment 3 - Formula               Spent 1 hour reading, 4 coding, 4 testing/debugging
 
 No known bugs or deficiencies, stands on it's own.
 
@@ -29,3 +30,5 @@ I referenced a Microsoft site to help me find how to evaluate whether a token is
 Introducing me to the RegexOptions.ignorecase, and to use the @"\w+" to help with the else if statement
 for the delegate. The website is listed below
 https://learn.microsoft.com/en-us/dotnet/api/system.text.regularexpressions.regex.match?view=net-7.0
+I referenced the following website to understand the syntax on multiple catch statements on try-catch 
+https://code-maze.com/csharp-catch-multiple-exceptions/

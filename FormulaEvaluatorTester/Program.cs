@@ -15,8 +15,8 @@ public static class FormulaEvaluatorTest
     {
         Evaluator ev = new Evaluator();
         int value;
-        value = Evaluator.Evaluate("1 + 1", s => 1);
-        return value == 2;
+        value = Evaluator.Evaluate("3 + 2 * (12-1)", s => 1);
+        return value == 25;
     }
 
     /// <summary>
