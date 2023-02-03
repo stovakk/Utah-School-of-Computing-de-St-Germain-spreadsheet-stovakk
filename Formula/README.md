@@ -4,7 +4,7 @@ Date:      2-Feb-2023
 Course:    CS 3500, University of Utah, School of Computing
 GitHub ID: Stovakk
 Date:	   2-Feb-2023
-Solution:  FormulaEvaluator
+Solution:  Formula
 Copyright: CS 3500 and Nate Stovak, 
 
 The program is currently capable of finding the answer to mathematical expressions which may or may not
