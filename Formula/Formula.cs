@@ -285,12 +285,12 @@ namespace SpreadsheetUtilities
 
             } 
             // happens if the lookup deleagate can't find an associating value
-            catch(ArgumentException e)
+            catch(ArgumentException)
             {
                 return new FormulaError("Invalid Formula, a variable is invalid");
             }
             // happens when divide by zero occurs
-            catch(DivideByZeroException e)
+            catch(DivideByZeroException)
             {
                 return new FormulaError("Invalid Formula, divide by zero");
             }
