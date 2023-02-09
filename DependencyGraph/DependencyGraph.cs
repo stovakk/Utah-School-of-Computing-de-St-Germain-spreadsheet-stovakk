@@ -122,13 +122,11 @@ namespace SpreadsheetUtilities
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
-            if (!dependents.ContainsKey(s))
+            if (dependents.ContainsKey(s))
             {
-                return new HashSet<String>();
+                return new HashSet<String>(dependents[s]);
             }
-            String[] results = new string[dependents[s].Count];
-            dependents[s].CopyTo(results);
-            return results;
+            return new HashSet<String>();
         }
         /// <summary>
         /// Enumerates dependees(s).

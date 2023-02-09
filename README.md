@@ -10,13 +10,15 @@ Copyright: CS 3500 and Nate Stovak,
 The Solution is currently capable of evalutaing mathematical expressions and also testing them in many cases
 to make sure the evalutation method is correct. The mathematical expression can now also normalize and ask the user
 what variables are valid, along with throw exceptions at the time they happen as to not waste the user's time.
-Along with the capability to produce a dependency graph of associated cells when they are implemented
+Along with the capability to produce a dependency graph of associated cells when they are implemented. There is now also
+a dicitonary that can store cells, and find dependencys. The dictionary works as a spreadsheet of it's own
 
 
 Hours Estimated/Worked         Assignment                       Note
          9.5  /   10    - Assignment 1 - Formula Evaluator     Spent 5 hours fighting Git and Visual Studios
          7    /   8     - Assignment 2 - Dependency Graph      Spent 4 hours on project, 2 creating tests/debugging, 1 documentation
          9    /   10    - Assignment 3 - Formula               Spent 1 hour reading, 4 coding, 4 testing/debugging
+         7    /   8     - Assignment 4 - Spreadsheet           Spent .5 hour reading, 3 coding, 3 testing/debugging, .5 documentation
 
 No known bugs or deficiencies, stands on it's own.
 
@@ -32,3 +34,4 @@ for the delegate. The website is listed below
 https://learn.microsoft.com/en-us/dotnet/api/system.text.regularexpressions.regex.match?view=net-7.0
 I referenced the following website to understand the syntax on multiple catch statements on try-catch 
 https://code-maze.com/csharp-catch-multiple-exceptions/
+
