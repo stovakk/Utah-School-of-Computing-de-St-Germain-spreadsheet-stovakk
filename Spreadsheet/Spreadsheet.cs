@@ -1,4 +1,19 @@
-﻿using SpreadsheetUtilities;
+﻿// implementation written by Nate Stovak for CS 3500, February 2023.
+// Version 1.1 (Create Cell class)
+// Version 1.2 (Do Set methods and other helper methods)
+// Version 1.3 (Finished debugging)
+
+/// Author: Nate Stovak
+/// Partner: None
+/// Date:      9 - Feb - 2023
+/// Course: CS 3500, University of Utah, School of Computing
+/// GitHub ID: Stovakk
+/// Date:	   9 - Feb - 2023
+/// Solution: Spreadsheet
+/// Copyright: CS 3500 and Nate Stovak,
+
+
+using SpreadsheetUtilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +24,12 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace SS
 {
+
+    /// <summary>
+    /// This class creates a spreadsheet using cells in a cell class I created
+    /// at the bottom, the class is able to set and get cells and their contents
+    /// along with find any excpetions needed
+    /// </summary>
     public class Spreadsheet : AbstractSpreadsheet
     {
         private Dictionary<String, cell> spread;

@@ -1,3 +1,15 @@
+// implementation written by Nate Stovak for CS 3500, February 2023.
+// Version 1.1 (Write Tests and debugg Spreadsheet class)
+
+/// Author: Nate Stovak
+/// Partner: None
+/// Date:      9 - Feb - 2023
+/// Course: CS 3500, University of Utah, School of Computing
+/// GitHub ID: Stovakk
+/// Date:	   9 - Feb - 2023
+/// Solution: Spreadsheet
+/// Copyright: CS 3500 and Nate Stovak,
+
 using SpreadsheetUtilities;
 using SS;
 using System.Security.Cryptography;
