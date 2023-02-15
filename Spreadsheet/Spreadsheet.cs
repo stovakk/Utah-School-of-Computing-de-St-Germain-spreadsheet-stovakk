@@ -16,10 +16,12 @@
 using SpreadsheetUtilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SS
@@ -34,14 +36,54 @@ namespace SS
     {
         private Dictionary<String, cell> spread;
         private DependencyGraph dg;
+        private bool changed;
+
+        public override bool Changed 
+        { 
+            get
+            {
+                return changed;
+            }
+            protected set
+            {
+                changed = value;
+            }
+        }
 
         /// <summary>
         /// Creates a new spreadsheet
         /// </summary>
-        public Spreadsheet() 
+        public Spreadsheet() : base(s => true, s => s, "original") 
         {
             spread = new Dictionary<string, cell>();
             dg = new DependencyGraph();
+
+            changed = false;
+        }
+
+        public Spreadsheet(Func<String, bool> isValid, Func<String, String> Normalize, String version)
+            : base(isValid, Normalize, version)
+        {
+            spread = new Dictionary<string, cell>();
+            dg = new DependencyGraph();
+
+            changed = false;
+        }
+
+        public Spreadsheet(String filePath, Func<String, bool> isValid, Func<String, String> Normalize, String version)
+            : base(isValid, Normalize, version)
+        {
+            spread = new Dictionary<string, cell>();
+            dg = new DependencyGraph();
+
+            changed = false;
+
+            if(!(GetSavedVersion(filePath).Equals(version)))
+            {
+                throw new SpreadsheetReadWriteException("filepath doesn't match the version");
+            }
+
+            readFile(filePath);
         }
 
         /// <inheritdoc/>
@@ -132,7 +174,7 @@ namespace SS
             dg.ReplaceDependees(name, formula.GetVariables());
             try
             {
-                cell cell = new cell(formula);
+                cell cell = new cell(formula, LookupVals);
 
                 // if cell already has something in it, replace it, otherwise make new cell
                 if (spread.ContainsKey(name))
@@ -204,6 +246,207 @@ namespace SS
             if (text == null) throw new ArgumentNullException();
         }
 
+        public override IList<string> SetContentsOfCell(string name, string content)
+        {
+            HashSet<String> dependents;
+
+            // if name is invalid, throw exception
+            if (!(IsValid(name)))
+                throw new InvalidNameException();
+            
+            // if content is a double, add it as a cell that is a double
+            if(Double.TryParse(content, out double doubleContent))
+            {
+                dependents = new HashSet<String>(SetCellContents(name, doubleContent));
+            }
+
+            // if content is a formula, make a new formula with it, and it as a cell
+            // that is a formula
+            else if (content.StartsWith("="))
+            {
+                String formulaString = content[1..];
+
+                Formula form = new Formula(formulaString, Normalize, isValid);
+
+                dependents = new HashSet<String>(SetCellContents(name, form));
+            }
+            else
+            {
+                dependents = new HashSet<String>(SetCellContents(name, content));
+            }
+
+            changed = true;
+
+            foreach(string key in dependents)
+            {
+                if(spread.TryGetValue(key, out cell dependentCell))
+                {
+                    dependentCell.reEvaluate(LookupVals);
+                }
+            }
+
+            return dependents.ToImmutableList<String>();
+        }
+
+        public override string GetSavedVersion(string filename)
+        {
+            try
+            {
+                using (XmlReader xmlReads = XmlReader.Create(filename))
+                {
+                    while (xmlReads.Read())
+                    {
+                        if (xmlReads.Name.Equals("spreadsheet"))
+                        {
+                            return xmlReads.GetAttribute("version");
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new SpreadsheetReadWriteException(e.Message);
+            }
+
+            throw new SpreadsheetReadWriteException("Version does not exist in the current context");
+        }
+
+        public override void Save(string filename)
+        {
+            if (filename.Equals(""))
+                throw new SpreadsheetReadWriteException("The filename is empty");
+
+            try
+            {
+                XmlWriterSettings settings = new XmlWriterSettings();
+                settings.Indent = true;
+
+                using (XmlWriter xmlWrites = XmlWriter.Create(filename, settings))
+                {
+                    // start xml document
+                    xmlWrites.WriteStartDocument(); 
+                    // open with tag "spreadsheet"
+                    xmlWrites.WriteStartElement("spreadsheet");              
+                    xmlWrites.WriteAttributeString("version", null, Version);
+
+                    foreach (string cell in spread.Keys)
+                    {
+                        // create tag "cell"
+                        xmlWrites.WriteStartElement("cell");   
+                        // create tag of name of cell
+                        xmlWrites.WriteElementString("name", cell);
+
+                        // cell contents
+                        string cellContents;
+
+                        // if cell is a double, store it as a string using toString()
+                        if (spread[cell].Content is double)
+                        {                        
+                            cellContents = spread[cell].Content.ToString();
+                        }
+                        // else if the cell is a formula, store it with an equals sign using toString()
+                        else if (spread[cell].Content is Formula)
+                        {   
+                            cellContents = "=";
+                            cellContents += spread[cell].Content.ToString();
+                        }
+                        // else it's a string, treat it as such
+                        else
+                        {  
+                            cellContents = (string)spread[cell].Content;
+                        }
+
+                        // creates content tag and puts in contents of the cell
+                        xmlWrites.WriteElementString("contents", cellContents);  
+                        // closes cell tag
+                        xmlWrites.WriteEndElement();
+                    }
+                    // closes spreadsheet tag
+                    xmlWrites.WriteEndElement();
+                    // closes document
+                    xmlWrites.WriteEndDocument();
+
+                }
+
+            }
+            catch(XmlException e)
+            {
+                throw new SpreadsheetReadWriteException(e.ToString());
+            }
+            catch(IOException e)
+            {
+                throw new SpreadsheetReadWriteException("Unnable to read the file");
+            }
+
+        }
+
+        public override object GetCellValue(string name)
+        {
+            if (spread.TryGetValue(name, out cell cell))
+                return cell.Value;
+            else
+                return "";
+        }
+
+        private void readFile(string filename)
+        {
+            if (filename is null)
+                throw new SpreadsheetReadWriteException("file name is null");
+            if (filename.Equals(""))
+                throw new SpreadsheetReadWriteException("The filename cannot be empty");
+
+            try
+            {
+
+                XmlReaderSettings settings= new XmlReaderSettings();
+                settings.IgnoreWhitespace = true;
+                
+                using (XmlReader reader = XmlReader.Create(filename, settings))
+                {
+                    // name of cell
+                    String name = "";
+                    // contents of the cell
+                    String contents = "";
+                    bool nameSet = false;
+                    bool contentsSet = false;
+
+                    // while reader has elements to read
+                    while (reader.Read())
+                    {
+                        if (reader.IsStartElement())
+                        {
+                            switch(reader.Name)
+                            {
+                                case "name":
+                                    reader.Read();
+                                    name = reader.ReadContentAsString();
+                                    name = name.Trim();
+                                    nameSet = true;
+                                    break;
+
+                                case "contents":
+                                    reader.Read();
+                                    contents = reader.ReadContentAsString();
+                                    contents = contents.Trim();
+                                    SetContentsOfCell(name, contents);
+                                    contentsSet = true;
+                                    break;
+                            }
+                        }
+                    }
+
+                    if(!contentsSet && !nameSet)
+                    {
+                        throw new Exception("empty spreadsheet");
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                throw new SpreadsheetReadWriteException(e.Message);
+            }
+        }
+
         /// <summary>
         /// This class creates a cell to go inside the spreadsheet.
         /// It's functionality is to hold the content and value of the 
@@ -260,12 +503,41 @@ namespace SS
             /// Create cell for a formula cell
             /// </summary>
             /// <param name="contents"> content for a formula type cell </param>
-            public cell(Formula contents)
+            public cell(Formula contents, Func<string, double> lookup)
             {
                 Content = contents;
                 contentType = "Formula";
-
+                Value = contents.Evaluate(lookup);
+                valueType = "double";
             }
+
+            public void reEvaluate(Func<string, double> lookup)
+            {
+                if(contentType == "Formula")
+                {
+                    Formula form = (Formula)Content;
+                    Value = form.Evaluate(lookup);
+                }
+            }
+        }
+        private double LookupVals(string a)
+        {
+            cell lookupCell; // value of name
+
+            // if the dictionary contains the parameter
+            if (spread.TryGetValue(a, out lookupCell))
+            {
+                // check if cell is a double
+                if (lookupCell.Value is double)
+                    return (double)lookupCell.Value;
+                // else throw exception
+                else 
+                    throw new ArgumentException();
+            }
+            // if spreadsheet doesn't contains s, throw exception
+            else
+                throw new ArgumentException();
+
         }
 
     }
