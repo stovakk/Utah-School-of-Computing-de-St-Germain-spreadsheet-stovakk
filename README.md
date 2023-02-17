@@ -3,7 +3,7 @@ Partner:   None
 Date:      18-Jan-2023
 Course:    CS 3500, University of Utah, School of Computing
 GitHub ID: Stovakk
-Date:	   2-Feb-2023
+Date:	   16-Feb-2023
 Solution:  Spreadsheet
 Copyright: CS 3500 and Nate Stovak, 
 
@@ -19,6 +19,7 @@ Hours Estimated/Worked         Assignment                       Note
          7    /   8     - Assignment 2 - Dependency Graph      Spent 4 hours on project, 2 creating tests/debugging, 1 documentation
          9    /   10    - Assignment 3 - Formula               Spent 1 hour reading, 4 coding, 4 testing/debugging
          7    /   8     - Assignment 4 - Spreadsheet           Spent .5 hour reading, 3 coding, 3 testing/debugging, .5 documentation
+         12   /   10    - Assignment 5 - Spreadsheet           Spent 2 hours reading/whiteboard, 5 coding, 5 testing/debugging/documentation
 
 No known bugs or deficiencies, stands on it's own.
 
