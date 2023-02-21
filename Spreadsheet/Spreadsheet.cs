@@ -90,8 +90,6 @@ namespace SS
             spread = new Dictionary<string, cell>();
             dg = new DependencyGraph();
 
-            // has not been changed
-            changed = false;
 
             // happens when the filepath doesn't aline with the version
             if(!(GetSavedVersion(filePath).Equals(version)))
@@ -101,6 +99,9 @@ namespace SS
 
             // reads file and then inherently fills the spreadsheet
             readFile(filePath);
+
+            // has not been changed
+            changed = false;
         }
 
         /// <inheritdoc/>

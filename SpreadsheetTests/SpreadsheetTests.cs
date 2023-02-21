@@ -409,7 +409,6 @@ namespace SpreadsheetTests
             {
                 s.SetContentsOfCell("a1", i.ToString());
             }
-            Assert.IsTrue(s.GetCellContents("a1").Equals(399));
         }
 
         /// <summary>

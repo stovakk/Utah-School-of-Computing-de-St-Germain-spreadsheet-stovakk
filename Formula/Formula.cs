@@ -49,6 +49,7 @@ namespace SpreadsheetUtilities
     {
         private List<String> formulaTokens;
         private HashSet<String> normalVars;
+
         /// <summary>
         /// Creates a Formula from a string that consists of an infix expression written as
         /// described in the class comment.  If the expression is syntactically invalid,
@@ -90,38 +91,31 @@ namespace SpreadsheetUtilities
             formulaTokens = GetTokens(formula).ToList();
             normalVars = new HashSet<String>();
 
-            // if formula is empty, throw exception
-            if (formulaTokens.Count() == 0)
-            {
-                throw new FormulaFormatException("Invalid Formula, formula has no tokens in it");
-            }
+            emptyCheck();
 
             // initiating all the variables we will use 
             int openParentheses = 0;
             int closedParentheses = 0;
-            double tokenValue;
+            double tokenValue = 0;
             String previousToken = null;
 
+            CreateFormula(normalize, isValid, ref openParentheses, ref closedParentheses, ref tokenValue, ref previousToken);
+        }
+
+        private void CreateFormula(Func<string, string> normalize, Func<string, bool> isValid, ref int openParentheses, ref int closedParentheses, ref double tokenValue, ref string previousToken)
+        {
             for (int i = 0; i < formulaTokens.Count(); i++)
             {
                 String token = formulaTokens.ElementAt(i);
 
-                // if its the first token, it must be a valid variable, number, or open parentheses
-                if (i == 0)
-                {
-                    if (!(Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*") || double.TryParse(token, out tokenValue) || token.Equals("(")))
-                    {
-                        throw new FormulaFormatException("Invalid start to fomula, must begin with " +
-                            "valid variable, number, or (");
-                    }
-                }
+                tokenValue = TestFirstTokenFormula(tokenValue, i, token);
 
                 // progression through token's to see if they are valid inputs
                 if (token.Equals("("))
                 {
                     openParentheses++;
                 }
-                
+
                 else if (token.Equals(")"))
                 {
                     closedParentheses++;
@@ -134,7 +128,7 @@ namespace SpreadsheetUtilities
                 }
                 //
                 else if (token.Equals("+") || token.Equals("-") || token.Equals("*") || token.Equals("/"))
-                {}
+                { }
                 // if it's a number, add the toString version to the formulaTokens
                 // so it's easier to use .equals later on
                 else if (double.TryParse(token, out tokenValue))
@@ -143,12 +137,7 @@ namespace SpreadsheetUtilities
                 // formulaTokens so it's easier later on, and also to the hashSet of variables
                 else if (Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*"))
                 {
-                    if (isValid(normalize(token)) && Regex.IsMatch(normalize(token), @"[a-zA-Z_](?: [a-zA-Z_]|\d)*"))
-                    {
-                        normalVars.Add(normalize(token));
-                        this.formulaTokens[i] = normalize(token);
-                    }
-                    else throw new FormulaFormatException("Invalid formula, a variable is invalid");
+                    ChecksVariables(normalize, isValid, i, token);
                 }
                 // else it's something that we don't want
                 else
@@ -157,55 +146,103 @@ namespace SpreadsheetUtilities
                         "formula is invalid");
                 }
 
-                // if the last token doesn't have a valid input, throw an exception
-                if (i == formulaTokens.Count - 1)
-                {
-                    //if the last input is not a variable, number, or ) throw an exception
-                    if (!(Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*", RegexOptions.Singleline) || 
-                        double.TryParse(token, out tokenValue) || token.Equals(")")))
-                    {
-                        throw new FormulaFormatException("Invalid formula, must end in " +
-                            "valid variable, number, or )");
-                    }
-                    // if after the last token, the parentheses don't add up, throw an exception
-                    else if (openParentheses != closedParentheses)
-                    {
-                        throw new FormulaFormatException("Invalid Formula, not equal number of closed and open" +
-                            "parentheses");
-                    }
-                }
+                tokenValue = TestInvalidLastToken(openParentheses, closedParentheses, tokenValue, i, token);
 
-                // checks previous tokens to current tokens
-                if (previousToken != null && previousToken != "")
-                {
-                    // if the previous token was an operand or an open parentheses, the next token must be a 
-                    // variable, number, or open parentheses
-                    if (previousToken.Equals("(") || previousToken.Equals("+") || previousToken.Equals("-")
-                        || previousToken.Equals("*") || previousToken.Equals("/"))
-                    {
-                        if (!(Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*") || double.TryParse(token, out _) || token.Equals("(")))
-                        {
-                            throw new FormulaFormatException("Invalid formula, after an opened parentheses" +
-                                " or an operator (+,-,*,/), a number, variable, or opened parentheses must follow");
-                        }
-                    }
-                    // if the previous token was a number, variable, or closed parentheses, the next token must be an
-                    // operand or closed parentheses
-                    else if (double.TryParse(previousToken, out tokenValue) || (Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*")
-                             || previousToken.Equals(")")))
-                    {
-                        if (!(token.Equals("+") || token.Equals("-") || token.Equals("*") || token.Equals("/")
-                               || token.Equals(")")))
-                        {
-                            throw new FormulaFormatException("Invalid formula, after a valid number, variable" +
-                                " or closed parentheses, an operand (+,-,*,/) or closed parentheses must follow");
-                        }
-                    }
-                }
+                tokenValue = TestInvalidFormula(tokenValue, previousToken, token);
 
                 // sets previous token to current token for next time
                 previousToken = token;
             }
+        }
+
+        private void emptyCheck()
+        {
+            // if formula is empty, throw exception
+            if (formulaTokens.Count() == 0)
+            {
+                throw new FormulaFormatException("Invalid Formula, formula has no tokens in it");
+            }
+        }
+
+        private static double TestFirstTokenFormula(double tokenValue, int i, string token)
+        {
+            // if its the first token, it must be a valid variable, number, or open parentheses
+            if (i == 0)
+            {
+                if (!(Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*") || double.TryParse(token, out tokenValue) || token.Equals("(")))
+                {
+                    throw new FormulaFormatException("Invalid start to fomula, must begin with " +
+                        "valid variable, number, or (");
+                }
+            }
+
+            return tokenValue;
+        }
+
+        private void ChecksVariables(Func<string, string> normalize, Func<string, bool> isValid, int i, string token)
+        {
+            if (isValid(normalize(token)) && Regex.IsMatch(normalize(token), @"[a-zA-Z_](?: [a-zA-Z_]|\d)*"))
+            {
+                normalVars.Add(normalize(token));
+                this.formulaTokens[i] = normalize(token);
+            }
+            else throw new FormulaFormatException("Invalid formula, a variable is invalid");
+        }
+
+        private static double TestInvalidFormula(double tokenValue, string previousToken, string token)
+        {
+            // checks previous tokens to current tokens
+            if (previousToken != null && previousToken != "")
+            {
+                // if the previous token was an operand or an open parentheses, the next token must be a 
+                // variable, number, or open parentheses
+                if (previousToken.Equals("(") || previousToken.Equals("+") || previousToken.Equals("-")
+                    || previousToken.Equals("*") || previousToken.Equals("/"))
+                {
+                    if (!(Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*") || double.TryParse(token, out _) || token.Equals("(")))
+                    {
+                        throw new FormulaFormatException("Invalid formula, after an opened parentheses" +
+                            " or an operator (+,-,*,/), a number, variable, or opened parentheses must follow");
+                    }
+                }
+                // if the previous token was a number, variable, or closed parentheses, the next token must be an
+                // operand or closed parentheses
+                else if (double.TryParse(previousToken, out tokenValue) || (Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*")
+                         || previousToken.Equals(")")))
+                {
+                    if (!(token.Equals("+") || token.Equals("-") || token.Equals("*") || token.Equals("/")
+                           || token.Equals(")")))
+                    {
+                        throw new FormulaFormatException("Invalid formula, after a valid number, variable" +
+                            " or closed parentheses, an operand (+,-,*,/) or closed parentheses must follow");
+                    }
+                }
+            }
+
+            return tokenValue;
+        }
+
+        private double TestInvalidLastToken(int openParentheses, int closedParentheses, double tokenValue, int i, string token)
+        {
+            // if the last token doesn't have a valid input, throw an exception
+            if (i == formulaTokens.Count - 1)
+            {
+                //if the last input is not a variable, number, or ) throw an exception
+                if (!(Regex.IsMatch(token, @"[a-zA-Z_](?: [a-zA-Z_]|\d)*", RegexOptions.Singleline) ||
+                    double.TryParse(token, out tokenValue) || token.Equals(")")))
+                {
+                    throw new FormulaFormatException("Invalid formula, must end in " +
+                        "valid variable, number, or )");
+                }
+                // if after the last token, the parentheses don't add up, throw an exception
+                else if (openParentheses != closedParentheses)
+                {
+                    throw new FormulaFormatException("Invalid Formula, not equal number of closed and open" +
+                        "parentheses");
+                }
+            }
+
+            return tokenValue;
         }
 
         /// <summary>
@@ -522,6 +559,7 @@ namespace SpreadsheetUtilities
             }
             return hashCode;
         }
+
 
         /// <summary>
         /// Given an expression, enumerates the tokens that compose it.  Tokens are left paren;
